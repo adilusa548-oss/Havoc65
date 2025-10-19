@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Havoc FT | 3D Frontpage</title>
+  <link rel="icon" href="assets/favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #0b0c10, #1f2833);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    header h2 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #ffcc00;
+    }
+    nav a {
+      margin-left: 1.5rem;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      color: #ffcc00;
+    }
+    .overlay {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      top: 40vh;
+    }
+    .team-section {
+      position: relative;
+      z-index: 10;
+      background: #0b0c10;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .player-card {
+      background: #1f2833;
+      border-radius: 1rem;
+      padding: 1rem;
+      transition: transform 0.3s ease;
+    }
+    .player-card:hover {
+      transform: translateY(-10px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>HAVOC FT</h2>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#team">Team</a>
+      <a href="#matches">Matches</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <div id="scene-container"></div>
+  <div class="overlay" id="home">
+    <img src="assets/logo.png" alt="Havoc FT Logo" class="mx-auto mb-4 w-32" />
+    <h1 class="text-5xl md:text-7xl font-bold mb-4">HAVOC FT</h1>
+    <p class="text-lg md:text-2xl mb-6">Unleash the Chaos. Rule the Field.</p>
+    <button class="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 px-8 rounded-full transition">Join the Squad</button>
+  </div>
+
+  <section id="team" class="team-section">
+    <h2 class="text-4xl font-bold mb-6 text-yellow-400">Our Team</h2>
+    <div class="team-grid">
+      <div class="player-card">
+        <img src="assets/player1.png" class="rounded-full mx-auto mb-3" alt="Player 1" />
+        <h3 class="text-xl font-semibold">Adil Hasan</h3>
+        <p class="text-gray-400">Captain / Forward</p>
+      </div>
+      <div class="player-card">
+        <img src="assets/player2.png" class="rounded-full mx-auto mb-3" alt="Player 2" />
+        <h3 class="text-xl font-semibold">Rafi Ahmed</h3>
+        <p class="text-gray-400">Midfielder</p>
+      </div>
+      <div class="player-card">
+        <img src="assets/player3.png" class="rounded-full mx-auto mb-3" alt="Player 3" />
+        <h3 class="text-xl font-semibold">Naim Rahman</h3>
+        <p class="text-gray-400">Defender</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const container = document.getElementById('scene-container');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    const ambient = new THREE.AmbientLight(0x404040, 2);
+    scene.add(ambient);
+
+    const textureLoader = new THREE.TextureLoader();
+    const ballTexture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
+
+    const geometry = new THREE.SphereGeometry(2, 64, 64);
+    const material = new THREE.MeshStandardMaterial({ map: ballTexture, metalness: 0.4, roughness: 0.6 });
+    const ball = new THREE.Mesh(geometry, material);
+    scene.add(ball);
+
+    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 1 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -2;
+    scene.add(ground);
+
+    camera.position.z = 6;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ball.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
